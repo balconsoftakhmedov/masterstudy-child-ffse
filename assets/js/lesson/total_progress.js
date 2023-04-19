@@ -2,6 +2,8 @@
 
 (function ($) {
 	$(document).ready(function () {
+
+
 		/**
 		 * @var total_progress
 		 */
@@ -13,6 +15,7 @@
 		if (total_progress.completed) {
 			$popup.addClass('active');
 			jQuery("select.stm-related_course").select2("destroy");
+
 		}
 
 		if ($popup.hasClass('active')) stmLmsInitProgress();
@@ -43,8 +46,10 @@ function stmLmsInitProgress() {
 
 jQuery(document).ready(function ($) {
 
-	jQuery('.stm_related_course_button').on('click', function (event) {
+	jQuery(document).on('click', '.stm_related_course_button', function (event) {
+
 		event.preventDefault();
+		console.log('rrt gg');
 		var selectedOption = jQuery('.stm-related_course option:selected').val();
 		var ajaxUrl = stm_lms_ajaxurl + '?action=stm_lms_related_course&course_id=' + selectedOption + '&nonce=' + stm_lms_nonces['stm_lms_total_progress'];
 		jQuery.ajax({
@@ -53,11 +58,13 @@ jQuery(document).ready(function ($) {
 			data: {},
 			success: function (response) {
 				console.log(response);
+				window.location.href = response.related_course_url;;
 			},
 			error: function (error) {
 				console.log(error);
 			}
 		});
 	});
+
 
 });

@@ -140,8 +140,11 @@ $custom_success_image_id = STM_LMS_Options::get_option( 'finish_popup_image_succ
 
 					</div>
 					<div class="inner">
-						<?php $related_courses = stm_get_category_courses( $post_id );
-
+						<?php
+						$related_courses = stm_get_category_courses( $post_id );
+						$user_id               = get_current_user_id();
+						$pre_reqs              = get_user_meta( $user_id, 'prerequisites_' . $post_id, true );
+						$all_rel_course        = explode( ',', $pre_reqs );
 						?>
 						<select name="related_course" class="stm-related_course">
 							<?php foreach ( $related_courses as $related_course ) :

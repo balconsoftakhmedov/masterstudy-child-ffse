@@ -78,12 +78,7 @@ class STM_LMS_Prerequisites_Child {
 		$user_id     = get_current_user_id();
 		$preq_course = get_post_meta( $course_id, 'prerequisites', true );
 		if ( $course_id && $user_id ) {
-			$all_courses = get_posts( array(
-				'post_type'      => 'stm-courses',
-				'taxonomy'       => 'stm_lms_course_taxonomy',
-				'term'           => $course_id,
-				'posts_per_page' => - 1
-			) );
+			 $all_courses = stm_get_category_courses( $course_id );
 			if ( ! empty( $all_courses ) ) {
 				foreach ( $all_courses as $course ) {
 					$related_course_id = $course->ID;
@@ -91,6 +86,7 @@ class STM_LMS_Prerequisites_Child {
 					$all_rel_course    = explode( ',', $pre_reqs );
 					if ( $preq_course !== $course->ID || ! in_array( $course->ID, $all_rel_course ) ) {
 						$pre_reqs .= ( $pre_reqs ) ? $pre_reqs . ',' . $course_id : $course_id;
+						echo $pre_reqs;
 						update_user_meta( $user_id, 'prerequisites_' . $related_course_id, $pre_reqs );
 					}
 				}

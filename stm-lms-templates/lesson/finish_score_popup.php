@@ -1,33 +1,31 @@
 <?php
-
 /**
  * @var $post_id
  * @var $item_id
  */
 
 $completed = STM_LMS_Lesson::is_lesson_completed( null, $post_id, $item_id );
-
 stm_lms_register_style( 'lesson/total_progress' );
-stm_lms_register_script( 'lesson/total_progress', array( 'vue.js', 'vue-resource.js' ) );
+stm_lms_register_script_child( 'lesson/total_progress', array( 'vue.js', 'vue-resource.js' ) );
 wp_localize_script(
-	'stm-lms-lesson/total_progress',
-	'total_progress',
-	array(
-		'course_id' => $post_id,
-		'completed' => (bool) $completed,
-	)
+		'stm-lms-lesson/total_progress',
+		'total_progress',
+		array(
+				'course_id' => $post_id,
+				'completed' => (bool) $completed,
+		)
 );
 if ( class_exists( 'STM_LMS_Certificate_Builder' ) ) {
 	wp_register_script( 'jspdf', STM_LMS_URL . '/assets/vendors/jspdf.umd.js', array(), stm_lms_custom_styles_v(), false );
 	wp_enqueue_script(
-		'stm_generate_certificate',
-		STM_LMS_URL . '/assets/js/certificate_builder/generate_certificate.js',
-		array(
-			'jspdf',
-			'stm_certificate_fonts',
-		),
-		stm_lms_custom_styles_v(),
-		false
+			'stm_generate_certificate',
+			STM_LMS_URL . '/assets/js/certificate_builder/generate_certificate.js',
+			array(
+					'jspdf',
+					'stm_certificate_fonts',
+			),
+			stm_lms_custom_styles_v(),
+			false
 	);
 }
 $disable_smile           = STM_LMS_Options::get_option( 'finish_popup_image_disable', false );
@@ -69,7 +67,7 @@ $custom_success_image_id = STM_LMS_Options::get_option( 'finish_popup_image_succ
 						?>
 						<div class="stm_lms_finish_score__face">
 							<img src="<?php echo esc_url( $failed_image ); ?>"
-								v-if="!stats.course_completed"/>
+								 v-if="!stats.course_completed"/>
 							<img src="<?php echo esc_url( $success_image ); ?>" v-else/>
 						</div>
 					<?php endif; ?>
@@ -131,7 +129,7 @@ $custom_success_image_id = STM_LMS_Options::get_option( 'finish_popup_image_succ
 					<div class="inner">
 						<?php if ( class_exists( 'STM_LMS_Certificate_Builder' ) ) : ?>
 							<a v-if="stats.course_completed" href="#" class="btn btn-default stm_preview_certificate"
-								data-course-id="<?php echo esc_attr( $post_id ); ?>">
+							   data-course-id="<?php echo esc_attr( $post_id ); ?>">
 								<?php esc_html_e( 'Certificate', 'masterstudy-lms-learning-management-system' ); ?>
 							</a>
 						<?php endif; ?>
@@ -141,18 +139,22 @@ $custom_success_image_id = STM_LMS_Options::get_option( 'finish_popup_image_succ
 						</a>
 
 					</div>
-										<div class="inner">
-						<?php if ( class_exists( 'STM_LMS_Certificate_Builder' ) ) : ?>
-							<a v-if="stats.course_completed" href="#" class="btn btn-default stm_preview_certificate"
-								data-course-id="<?php echo esc_attr( $post_id ); ?>">
-								<?php esc_html_e( 'Certificate', 'masterstudy-lms-learning-management-system' ); ?>
-							</a>
-						<?php endif; ?>
+					<div class="inner">
+						<?php $related_courses = stm_get_category_courses( $post_id );
 
-						<a :href="stats.url" class="btn btn-default btn-green">
-							<?php esc_html_e( 'View course', 'masterstudy-lms-learning-management-system' ); ?>
-						</a>
-
+						?>
+						<select name="related_course" class="stm-related_course">
+							<?php foreach ( $related_courses as $related_course ) :
+								if ( $related_course->ID !== $post_id ):
+									?>
+									<option value="<?php echo esc_attr( $related_course->ID ); ?>">
+										<?php echo esc_html( $related_course->post_title ); ?>
+									</option>
+								<?php
+								endif;
+							endforeach; ?>
+						</select>
+						<button class="btn btn-default btn-green stm_related_course_button"><?php esc_html_e( 'Lock out next course', 'masterstudy-child' ); ?></button>
 					</div>
 
 

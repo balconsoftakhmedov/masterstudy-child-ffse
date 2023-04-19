@@ -139,7 +139,7 @@ $custom_success_image_id = STM_LMS_Options::get_option( 'finish_popup_image_succ
 						</a>
 
 					</div>
-					<div class="inner">
+					<div class="inner stm-cat-course">
 						<?php
 						$related_courses = stm_get_category_courses( $post_id );
 						$user_id               = get_current_user_id();

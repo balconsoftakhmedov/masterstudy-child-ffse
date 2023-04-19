@@ -2,8 +2,6 @@
 
 (function ($) {
 	$(document).ready(function () {
-
-
 		/**
 		 * @var total_progress
 		 */
@@ -47,24 +45,27 @@ function stmLmsInitProgress() {
 jQuery(document).ready(function ($) {
 
 	jQuery(document).on('click', '.stm_related_course_button', function (event) {
-
 		event.preventDefault();
-		console.log('rrt gg');
 		var selectedOption = jQuery('.stm-related_course option:selected').val();
 		var ajaxUrl = stm_lms_ajaxurl + '?action=stm_lms_related_course&course_id=' + selectedOption + '&nonce=' + stm_lms_nonces['stm_lms_total_progress'];
+		var spinner = jQuery('<div class="stm-spinner"></div>');
+		spinner.appendTo(jQuery('.stm_related_course_button'));
+
 		jQuery.ajax({
 			url: ajaxUrl,
 			type: 'POST',
 			data: {},
 			success: function (response) {
-				console.log(response);
-				window.location.href = response.related_course_url;;
+				window.location.href = response.data.related_course_url;
+				jQuery('.stm-cat-course').remove();
 			},
 			error: function (error) {
 				console.log(error);
+			},
+			complete: function () {
+				spinner.remove();
 			}
 		});
 	});
-
 
 });

@@ -19,7 +19,8 @@ class STM_LMS_Prerequisites_Child {
 		$user_id     = ( ! empty( $user['id'] ) ) ? $user['id'] : 0;
 		//	update_user_meta( $user_id, 'prerequisites_' . $course_id, ''  );
 		$preq_course .= ( get_user_meta( $user_id, 'prerequisites_' . $course_id, true ) ) ? ',' . get_user_meta( $user_id, 'prerequisites_' . $course_id, true ) : '';
-
+		$preq_course = self::get_unique( $preq_course  );
+		//echo 'prerequisites_' . $course_id;print_r($preq_course);
 		return $preq_course;
 	}
 
@@ -55,6 +56,7 @@ class STM_LMS_Prerequisites_Child {
 	}
 
 	function instead_buy_buttons( $course_id ) {
+
 		if ( ! $this->is_prerequisite( true, $course_id ) ) {
 			$prereq       = explode( ',', $this->get_prereq_courses( $course_id ) );
 			$user         = STM_LMS_User::get_current_user();
@@ -78,17 +80,21 @@ class STM_LMS_Prerequisites_Child {
 		$user_id     = get_current_user_id();
 		$preq_course = get_post_meta( $course_id, 'prerequisites', true );
 		if ( $course_id && $user_id ) {
-			 $all_courses = stm_get_category_courses( $course_id );
+			$all_courses = stm_get_category_courses( $course_id );
 			if ( ! empty( $all_courses ) ) {
 				foreach ( $all_courses as $course ) {
 					$related_course_id = $course->ID;
 					$pre_reqs          = get_user_meta( $user_id, 'prerequisites_' . $related_course_id, true );
+					$pre_reqs          = $pre_reqs . ',' . $preq_course;
 					$all_rel_course    = explode( ',', $pre_reqs );
-					if ( $preq_course !== $course->ID || ! in_array( $course->ID, $all_rel_course ) ) {
-						$pre_reqs .= ( $pre_reqs ) ? $pre_reqs . ',' . $course_id : $course_id;
-						echo $pre_reqs;
+					$all_rel_course[]  = $course_id;
+					if ( ! in_array( $course->ID, $all_rel_course ) ) {
+						$pre_reqs = ( $pre_reqs ) ? $pre_reqs . ',' . $course_id : $course_id;
+						$pre_reqs = $this->get_unique( $pre_reqs );
+					//	echo 'prerequisites_' . $related_course_id . ' ttt ' . $pre_reqs . ' bbbb <br>';
 						update_user_meta( $user_id, 'prerequisites_' . $related_course_id, $pre_reqs );
 					}
+					//update_user_meta( $user_id, 'prerequisites_' . $related_course_id, '' );
 				}
 			}
 			wp_send_json_success( array( 'message' => 'User prerequisites updated successfully.', 'related_course_url' => get_permalink( $course_id ) ) );
@@ -98,6 +104,14 @@ class STM_LMS_Prerequisites_Child {
 		wp_die();
 	}
 
+	public function get_unique( $pre_reqs ) {
+		$pre_reqs = explode( ',', $pre_reqs );
+		$pre_reqs = array_unique( $pre_reqs );
+		$pre_reqs = array_filter($pre_reqs);
+		$pre_reqs = implode( ',', $pre_reqs );
+
+		return $pre_reqs;
+	}
 
 }
 
